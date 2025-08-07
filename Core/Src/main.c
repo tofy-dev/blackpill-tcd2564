@@ -595,7 +595,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 //	CDC_Transmit_FS((uint8_t*)data, strlen(data));
 
     if (hadc->Instance == ADC1) {
-		counter = counter % 100;
+		counter = counter % 10;
 		if (counter++ == 0) {
 			memcpy(&marked_buffer[4], DMA_buffer, DMA_SIZE*2);
 			CDC_Transmit_FS((uint8_t*)marked_buffer, sizeof(marked_buffer));
