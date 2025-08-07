@@ -53,6 +53,8 @@ TIM_HandleTypeDef htim5;
 
 /* USER CODE BEGIN PV */
 uint16_t DMA_buffer[DMA_SIZE];
+uint8_t marked_buffer[DMA_SIZE*2 + 8];
+
 int counter = 0;
 /* USER CODE END PV */
 
@@ -72,7 +74,6 @@ static void MX_TIM5_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -92,7 +93,15 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  marked_buffer[0] = 0xDE;
+  marked_buffer[1] = 0xAD;
+  marked_buffer[2] = 0xBE;
+  marked_buffer[3] = 0xEF;
 
+  marked_buffer[DMA_SIZE*2 + 4] = 0xFE;
+  marked_buffer[DMA_SIZE*2 + 5] = 0xEB;
+  marked_buffer[DMA_SIZE*2 + 6] = 0xDA;
+  marked_buffer[DMA_SIZE*2 + 7] = 0xED;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -588,7 +597,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     if (hadc->Instance == ADC1) {
 		counter = counter % 100;
 		if (counter++ == 0) {
-			CDC_Transmit_FS((uint8_t*)DMA_buffer, DMA_SIZE*2);
+			memcpy(&marked_buffer[4], DMA_buffer, DMA_SIZE*2);
+			CDC_Transmit_FS((uint8_t*)marked_buffer, sizeof(marked_buffer));
 		}
     }
 }
